@@ -10,16 +10,25 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * 核心概念中的； application 实体类
+ */
 @Entity
 @Table(name = "App")
 @SQLDelete(sql = "Update App set isDeleted = 1 where id = ?")
 @Where(clause = "isDeleted = 0")
 public class App extends BaseEntity {
 
+  /**
+   * application 名称
+   */
   @NotBlank(message = "Name cannot be blank")
   @Column(name = "Name", nullable = false)
   private String name;
 
+  /**
+   * application 编号， 有校验规则， 需要是字母， 数字和 _-.
+   */
   @NotBlank(message = "AppId cannot be blank")
   @Pattern(
       regexp = InputValidator.CLUSTER_NAMESPACE_VALIDATOR,
@@ -28,16 +37,28 @@ public class App extends BaseEntity {
   @Column(name = "AppId", nullable = false)
   private String appId;
 
+  /**
+   * 组织 id
+   */
   @Column(name = "OrgId", nullable = false)
   private String orgId;
 
+  /**
+   * 组织名称
+   */
   @Column(name = "OrgName", nullable = false)
   private String orgName;
 
+  /**
+   * 项目负责人的名称： 在创建时选的
+   */
   @NotBlank(message = "OwnerName cannot be blank")
   @Column(name = "OwnerName", nullable = false)
   private String ownerName;
 
+  /**
+   * 项目负责人的邮箱
+   */
   @NotBlank(message = "OwnerEmail cannot be blank")
   @Column(name = "OwnerEmail", nullable = false)
   private String ownerEmail;
