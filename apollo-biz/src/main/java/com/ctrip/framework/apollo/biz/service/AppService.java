@@ -24,6 +24,12 @@ public class AppService {
     this.auditService = auditService;
   }
 
+  /**
+   * 是否唯一的 appid
+   *
+   * @param appId
+   * @return
+   */
   public boolean isAppIdUnique(String appId) {
     Objects.requireNonNull(appId, "AppId must not be null");
     return Objects.isNull(appRepository.findByAppId(appId));
@@ -58,14 +64,18 @@ public class AppService {
 
   @Transactional
   public App save(App entity) {
+
+    // 存在则抛出异常
     if (!isAppIdUnique(entity.getAppId())) {
       throw new ServiceException("appId not unique");
     }
+    // 由于 id 是自动创建的， 因此此时进行归 0 设置来保护
     entity.setId(0);//protection
     App app = appRepository.save(entity);
 
+    // 记录审核信息
     auditService.audit(App.class.getSimpleName(), app.getId(), Audit.OP.INSERT,
-        app.getDataChangeCreatedBy());
+            app.getDataChangeCreatedBy());
 
     return app;
   }
