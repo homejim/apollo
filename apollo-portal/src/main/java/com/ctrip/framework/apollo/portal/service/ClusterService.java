@@ -27,11 +27,14 @@ public class ClusterService {
   }
 
   public ClusterDTO createCluster(Env env, ClusterDTO cluster) {
+    // 唯一性校验
     if (!clusterAPI.isClusterUnique(cluster.getAppId(), env, cluster.getName())) {
       throw new BadRequestException(String.format("cluster %s already exists.", cluster.getName()));
     }
+    // AdminService 创建
     ClusterDTO clusterDTO = clusterAPI.create(env, cluster);
 
+    // Tracer 记录
     Tracer.logEvent(TracerEventType.CREATE_CLUSTER, cluster.getAppId(), "0", cluster.getName());
 
     return clusterDTO;

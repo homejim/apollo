@@ -31,12 +31,15 @@ public class ClusterController {
   public ClusterDTO create(@PathVariable("appId") String appId,
                            @RequestParam(value = "autoCreatePrivateNamespace", defaultValue = "true") boolean autoCreatePrivateNamespace,
                            @Valid @RequestBody ClusterDTO dto) {
+    // 反射进行对象转换
     Cluster entity = BeanUtils.transform(Cluster.class, dto);
+    // 唯一性校验
     Cluster managedEntity = clusterService.findOne(appId, entity.getName());
     if (managedEntity != null) {
       throw new BadRequestException("cluster already exist.");
     }
 
+    // 保存 Cluster 对象， 并创建其对应的 namespace
     if (autoCreatePrivateNamespace) {
       entity = clusterService.saveWithInstanceOfAppNamespaces(entity);
     } else {

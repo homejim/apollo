@@ -33,10 +33,12 @@ public class ClusterController {
   @PostMapping(value = "apps/{appId}/envs/{env}/clusters")
   public ClusterDTO createCluster(@PathVariable String appId, @PathVariable String env,
                                   @Valid @RequestBody ClusterDTO cluster) {
+    // 获取操作信息
     String operator = userInfoHolder.getUser().getUserId();
     cluster.setDataChangeLastModifiedBy(operator);
     cluster.setDataChangeCreatedBy(operator);
 
+    // 创建集群到对应的环境中
     return clusterService.createCluster(Env.valueOf(env), cluster);
   }
 

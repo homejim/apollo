@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * @author Jason Song(song_s@ctrip.com)
+ * 对应 Cluster 的核心概念
  */
 @Entity
 @Table(name = "Cluster")
@@ -18,12 +18,21 @@ import javax.persistence.Table;
 @Where(clause = "isDeleted = 0")
 public class Cluster extends BaseEntity implements Comparable<Cluster> {
 
+  /**
+   * 集群的名称
+   */
   @Column(name = "Name", nullable = false)
   private String name;
 
+  /**
+   * 所属的 appid。 一个 app 下有多个集群
+   */
   @Column(name = "AppId", nullable = false)
   private String appId;
 
+  /**
+   * 父集群 id。
+   */
   @Column(name = "ParentClusterId", nullable = false)
   private long parentClusterId;
 

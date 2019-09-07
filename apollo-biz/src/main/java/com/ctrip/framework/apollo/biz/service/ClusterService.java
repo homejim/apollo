@@ -67,6 +67,7 @@ public class ClusterService {
 
     Cluster savedCluster = saveWithoutInstanceOfAppNamespaces(entity);
 
+    // 实例化 Namespace
     namespaceService.instanceOfAppNamespaces(savedCluster.getAppId(), savedCluster.getName(),
                                              savedCluster.getDataChangeCreatedBy());
 
@@ -75,14 +76,17 @@ public class ClusterService {
 
   @Transactional
   public Cluster saveWithoutInstanceOfAppNamespaces(Cluster entity) {
+
+    // 唯一性校验
     if (!isClusterNameUnique(entity.getAppId(), entity.getName())) {
       throw new BadRequestException("cluster not unique");
     }
+    // 保存对象到数据库
     entity.setId(0);//protection
     Cluster cluster = clusterRepository.save(entity);
 
     auditService.audit(Cluster.class.getSimpleName(), cluster.getId(), Audit.OP.INSERT,
-                       cluster.getDataChangeCreatedBy());
+            cluster.getDataChangeCreatedBy());
 
     return cluster;
   }
