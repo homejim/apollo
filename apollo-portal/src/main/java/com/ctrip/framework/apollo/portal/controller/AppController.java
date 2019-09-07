@@ -107,16 +107,27 @@ public class AppController {
     return appService.findByAppIds(appIds, page);
   }
 
+  /**
+   * 创建 Application
+   *
+   * 使用了 SpringSecurity 进行权限的校验
+   * @param appModel
+   * @return
+   */
   @PreAuthorize(value = "@permissionValidator.hasCreateApplicationPermission()")
   @PostMapping
   public App create(@Valid @RequestBody AppModel appModel) {
 
+    // Model->App, 即 DTO -> 实体类
     App app = transformToApp(appModel);
 
+    // 创建
     App createdApp = appService.createAppInLocal(app);
 
+    // 发布 AppCreationEvent 事件
     publisher.publishEvent(new AppCreationEvent(createdApp));
 
+    // 创建对应的
     Set<String> admins = appModel.getAdmins();
     if (!CollectionUtils.isEmpty(admins)) {
       rolePermissionService
@@ -124,6 +135,7 @@ public class AppController {
               admins, userInfoHolder.getUser().getUserId());
     }
 
+    // 返回创建的实体对象
     return createdApp;
   }
 

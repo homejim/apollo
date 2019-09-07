@@ -79,16 +79,19 @@ public class DefaultRolePermissionService implements RolePermissionService {
     @Transactional
     public Set<String> assignRoleToUsers(String roleName, Set<String> userIds,
                                          String operatorUserId) {
+
+        // 检查是否存在相应的角色
         Role role = findRoleByRoleName(roleName);
         Preconditions.checkState(role != null, "Role %s doesn't exist!", roleName);
 
+        // 获取没有该角色的用户
         List<UserRole> existedUserRoles =
                 userRoleRepository.findByUserIdInAndRoleId(userIds, role.getId());
         Set<String> existedUserIds =
             existedUserRoles.stream().map(UserRole::getUserId).collect(Collectors.toSet());
-
         Set<String> toAssignUserIds = Sets.difference(userIds, existedUserIds);
 
+        // 插入数据库进行授权
         Iterable<UserRole> toCreate = toAssignUserIds.stream().map(userId -> {
             UserRole userRole = new UserRole();
             userRole.setRoleId(role.getId());

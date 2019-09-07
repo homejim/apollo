@@ -119,6 +119,9 @@ public class App extends BaseEntity {
         .add("ownerEmail", ownerEmail).toString();
   }
 
+  /**
+   * 建造者模式
+   */
   public static class Builder {
 
     public Builder() {

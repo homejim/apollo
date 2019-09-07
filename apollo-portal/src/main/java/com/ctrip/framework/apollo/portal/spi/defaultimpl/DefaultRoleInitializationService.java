@@ -40,27 +40,29 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
   public void initAppRoles(App app) {
     String appId = app.getAppId();
 
+    // 创建对应的 App 管理员角色
     String appMasterRoleName = RoleUtils.buildAppMasterRoleName(appId);
 
-    //has created before
+    //has created before。 检查是否已经创建
     if (rolePermissionService.findRoleByRoleName(appMasterRoleName) != null) {
       return;
     }
     String operator = app.getDataChangeCreatedBy();
-    //create app permissions
+    //create app permissions。 创建对应的 app 权限
     createAppMasterRole(appId, operator);
-    //create manageAppMaster permission
+    //create manageAppMaster permission。
     createManageAppMasterRole(appId, operator);
 
-    //assign master role to user
+    //assign master role to user。 授权 master 角色给 app 责任人
     rolePermissionService
         .assignRoleToUsers(RoleUtils.buildAppMasterRoleName(appId), Sets.newHashSet(app.getOwnerName()),
             operator);
 
+
     initNamespaceRoles(appId, ConfigConsts.NAMESPACE_APPLICATION, operator);
     initNamespaceEnvRoles(appId, ConfigConsts.NAMESPACE_APPLICATION, operator);
 
-    //assign modify、release namespace role to user
+    //assign modify、release namespace role to user。 授权修改/发布的权限给当前的用户
     rolePermissionService.assignRoleToUsers(
         RoleUtils.buildNamespaceRoleName(appId, ConfigConsts.NAMESPACE_APPLICATION, RoleType.MODIFY_NAMESPACE),
         Sets.newHashSet(operator), operator);
@@ -70,15 +72,24 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
 
   }
 
+  /**
+   * 初始化 Application 对应的 namespace 角色（修改和发布的权限）
+   *
+   * @param appId applicationId
+   * @param namespaceName namespace 概念
+   * @param operator 操作人
+   */
   @Transactional
   public void initNamespaceRoles(String appId, String namespaceName, String operator) {
 
+    // 不存在则创建对应的 namespace 修改权限
     String modifyNamespaceRoleName = RoleUtils.buildModifyNamespaceRoleName(appId, namespaceName);
     if (rolePermissionService.findRoleByRoleName(modifyNamespaceRoleName) == null) {
       createNamespaceRole(appId, namespaceName, PermissionType.MODIFY_NAMESPACE,
           modifyNamespaceRoleName, operator);
     }
 
+    // 不存在则创建对应的 namespace 发布权限
     String releaseNamespaceRoleName = RoleUtils.buildReleaseNamespaceRoleName(appId, namespaceName);
     if (rolePermissionService.findRoleByRoleName(releaseNamespaceRoleName) == null) {
       createNamespaceRole(appId, namespaceName, PermissionType.RELEASE_NAMESPACE,
@@ -86,8 +97,16 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
     }
   }
 
+  /**
+   * 创建对应的环境角色
+   *
+   * @param appId
+   * @param namespaceName
+   * @param operator
+   */
   @Transactional
   public void initNamespaceEnvRoles(String appId, String namespaceName, String operator) {
+    // FAT UAT PRO 的环境
     List<Env> portalEnvs = portalConfig.portalSupportedEnvs();
 
     for (Env env : portalEnvs) {
