@@ -3,16 +3,19 @@ package com.ctrip.framework.apollo.common.dto;
 import com.ctrip.framework.apollo.common.utils.InputValidator;
 import javax.validation.constraints.Pattern;
 
-public class NamespaceDTO extends BaseDTO{
+public class NamespaceDTO extends BaseDTO {
+  // id
   private long id;
 
+  // 所属 appid
   private String appId;
 
+  // 对应集群的名称
   private String clusterName;
 
   @Pattern(
-      regexp = InputValidator.CLUSTER_NAMESPACE_VALIDATOR,
-      message = "Namespace格式错误: " + InputValidator.INVALID_CLUSTER_NAMESPACE_MESSAGE
+          regexp = InputValidator.CLUSTER_NAMESPACE_VALIDATOR,
+          message = "Namespace格式错误: " + InputValidator.INVALID_CLUSTER_NAMESPACE_MESSAGE
   )
   private String namespaceName;
 

@@ -54,8 +54,14 @@ public class DefaultRolePermissionService implements RolePermissionService {
         Role current = findRoleByRoleName(role.getRoleName());
         Preconditions.checkState(current == null, "Role %s already exists!", role.getRoleName());
 
+        /**
+         * 保存角色
+         */
         Role createdRole = roleRepository.save(role);
 
+        /**
+         * 权限和角色的映射
+         */
         if (!CollectionUtils.isEmpty(permissionIds)) {
             Iterable<RolePermission> rolePermissions = permissionIds.stream().map(permissionId -> {
                 RolePermission rolePermission = new RolePermission();
@@ -206,6 +212,7 @@ public class DefaultRolePermissionService implements RolePermissionService {
 
     /**
      * Create permission, note that permissionType + targetId should be unique
+     * 创建权限， 校验全局唯一
      */
     @Transactional
     public Permission createPermission(Permission permission) {

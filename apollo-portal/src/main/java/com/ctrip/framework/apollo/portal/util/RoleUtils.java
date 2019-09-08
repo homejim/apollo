@@ -8,7 +8,9 @@ import java.util.Iterator;
 
 public class RoleUtils {
 
+  // StringJoiner， 连接器， 连接符 +
   private static final Joiner STRING_JOINER = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR).skipNulls();
+  // StringSpliter, 分割器， 分隔符 +
   private static final Splitter STRING_SPLITTER = Splitter.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR)
       .omitEmptyStrings().trimResults();
 
@@ -42,10 +44,25 @@ public class RoleUtils {
     return STRING_JOINER.join(roleType, appId);
   }
 
+  /**
+   * 角色的名称
+   *
+   * @param appId
+   * @param namespaceName
+   * @return
+   */
   public static String buildModifyNamespaceRoleName(String appId, String namespaceName) {
     return buildModifyNamespaceRoleName(appId, namespaceName, null);
   }
 
+  /**
+   * ModifyNamespace+aapid+namespace+env, 使用 + 进行连接
+   *
+   * @param appId
+   * @param namespaceName
+   * @param env
+   * @return
+   */
   public static String buildModifyNamespaceRoleName(String appId, String namespaceName, String env) {
     return STRING_JOINER.join(RoleType.MODIFY_NAMESPACE, appId, namespaceName, env);
   }
@@ -74,10 +91,26 @@ public class RoleUtils {
     return STRING_JOINER.join(RoleType.RELEASE_NAMESPACE, appId, ConfigConsts.NAMESPACE_APPLICATION);
   }
 
+  /**
+   * 创建 Namespace 的 targetid
+   *
+   * @param appId
+   * @param namespaceName
+   * @return
+   */
   public static String buildNamespaceTargetId(String appId, String namespaceName) {
     return buildNamespaceTargetId(appId, namespaceName, null);
   }
 
+  /**
+   * 创建对应的 namespace targetid
+   * appid+namespaceName+env
+   *
+   * @param appId
+   * @param namespaceName
+   * @param env
+   * @return
+   */
   public static String buildNamespaceTargetId(String appId, String namespaceName, String env) {
     return STRING_JOINER.join(appId, namespaceName, env);
   }

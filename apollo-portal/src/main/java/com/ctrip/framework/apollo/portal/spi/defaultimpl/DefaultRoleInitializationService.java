@@ -185,6 +185,14 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
     rolePermissionService.createRoleWithPermissions(appMasterRole, appPermissionIds);
   }
 
+  /**
+   * 创建权限
+   *
+   * @param targetId
+   * @param permissionType
+   * @param operator
+   * @return
+   */
   private Permission createPermission(String targetId, String permissionType, String operator) {
     Permission permission = new Permission();
     permission.setPermissionType(permissionType);
@@ -202,17 +210,31 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
     return role;
   }
 
+  /**
+   * 创建角色
+   *
+   * @param appId appid
+   * @param namespaceName
+   * @param permissionType
+   * @param roleName
+   * @param operator
+   */
   private void createNamespaceRole(String appId, String namespaceName, String permissionType,
                                    String roleName, String operator) {
 
+    // 构造 Namespace 权限。 权限是 权限id+权限类型
     Permission permission =
-        createPermission(RoleUtils.buildNamespaceTargetId(appId, namespaceName), permissionType, operator);
+            createPermission(RoleUtils.buildNamespaceTargetId(appId, namespaceName), permissionType, operator);
+    // 创建权限
     Permission createdPermission = rolePermissionService.createPermission(permission);
 
+    // 构造角色。 角色就一个名称
     Role role = createRole(roleName, operator);
+    // 创建角色
     rolePermissionService
         .createRoleWithPermissions(role, Sets.newHashSet(createdPermission.getId()));
   }
+
 
   private void createNamespaceEnvRole(String appId, String namespaceName, String permissionType, String env,
                                       String roleName, String operator) {
