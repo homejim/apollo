@@ -87,6 +87,8 @@ public class AppNamespaceService {
 
   @Transactional
   public void createDefaultAppNamespace(String appId, String createBy) {
+
+    // 校验是否唯一
     if (!isAppNamespaceNameUnique(appId, ConfigConsts.NAMESPACE_APPLICATION)) {
       throw new ServiceException("appnamespace not unique");
     }
@@ -100,7 +102,7 @@ public class AppNamespaceService {
     appNamespaceRepository.save(appNs);
 
     auditService.audit(AppNamespace.class.getSimpleName(), appNs.getId(), Audit.OP.INSERT,
-                       createBy);
+            createBy);
   }
 
   @Transactional
@@ -115,8 +117,10 @@ public class AppNamespaceService {
 
     appNamespace = appNamespaceRepository.save(appNamespace);
 
+    //  给所有的 Cluster创建 namespace
     createNamespaceForAppNamespaceInAllCluster(appNamespace.getAppId(), appNamespace.getName(), createBy);
 
+    // 记录审核信息
     auditService.audit(AppNamespace.class.getSimpleName(), appNamespace.getId(), Audit.OP.INSERT, createBy);
     return appNamespace;
   }

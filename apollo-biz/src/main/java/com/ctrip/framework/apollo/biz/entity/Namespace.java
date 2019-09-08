@@ -15,12 +15,21 @@ import javax.persistence.Table;
 @Where(clause = "isDeleted = 0")
 public class Namespace extends BaseEntity {
 
+  /**
+   * 所属 appid
+   */
   @Column(name = "appId", nullable = false)
   private String appId;
 
+  /**
+   * 关联的 Cluster 名称
+   */
   @Column(name = "ClusterName", nullable = false)
   private String clusterName;
 
+  /**
+   * 对应的 AppNamespace 名称
+   */
   @Column(name = "NamespaceName", nullable = false)
   private String namespaceName;
 

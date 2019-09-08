@@ -32,6 +32,12 @@ public class AdminService {
     this.namespaceService = namespaceService;
   }
 
+  /**
+   * 创建 App 时， 异步调用同步
+   *
+   * @param app
+   * @return
+   */
   @Transactional
   public App createNewApp(App app) {
 

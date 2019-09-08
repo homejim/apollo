@@ -106,10 +106,11 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
    */
   @Transactional
   public void initNamespaceEnvRoles(String appId, String namespaceName, String operator) {
-    // FAT UAT PRO 的环境
+    // 环境信息
     List<Env> portalEnvs = portalConfig.portalSupportedEnvs();
 
     for (Env env : portalEnvs) {
+      // 初始化指定环境的 namespace role
       initNamespaceSpecificEnvRoles(appId, namespaceName, env.toString(), operator);
     }
   }
@@ -117,11 +118,13 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
   @Transactional
   public void initNamespaceSpecificEnvRoles(String appId, String namespaceName, String env, String operator) {
     String modifyNamespaceEnvRoleName = RoleUtils.buildModifyNamespaceRoleName(appId, namespaceName, env);
+    // 不存在则创建对应的 ModifyNamespace 权限
     if (rolePermissionService.findRoleByRoleName(modifyNamespaceEnvRoleName) == null) {
       createNamespaceEnvRole(appId, namespaceName, PermissionType.MODIFY_NAMESPACE, env,
           modifyNamespaceEnvRoleName, operator);
     }
 
+    // 不存在则创建对应的 ReleaseNamespace 权限
     String releaseNamespaceEnvRoleName = RoleUtils.buildReleaseNamespaceRoleName(appId, namespaceName, env);
     if (rolePermissionService.findRoleByRoleName(releaseNamespaceEnvRoleName) == null) {
       createNamespaceEnvRole(appId, namespaceName, PermissionType.RELEASE_NAMESPACE, env,

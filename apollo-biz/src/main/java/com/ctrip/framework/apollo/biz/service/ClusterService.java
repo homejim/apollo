@@ -121,8 +121,15 @@ public class ClusterService {
     return managedCluster;
   }
 
+  /**
+   * 创建默认的集群
+   *
+   * @param appId
+   * @param createBy
+   */
   @Transactional
   public void createDefaultCluster(String appId, String createBy) {
+    // 唯一性校验
     if (!isClusterNameUnique(appId, ConfigConsts.CLUSTER_NAME_DEFAULT)) {
       throw new ServiceException("cluster not unique");
     }

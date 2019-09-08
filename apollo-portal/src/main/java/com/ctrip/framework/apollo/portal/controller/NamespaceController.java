@@ -125,8 +125,10 @@ public class NamespaceController {
   public ResponseEntity<Void> createNamespace(@PathVariable String appId,
                                               @RequestBody List<NamespaceCreationModel> models) {
 
+    // 校验 model 非空
     checkModel(!CollectionUtils.isEmpty(models));
 
+    // 获取 namespace 和 操作人 operator
     String namespaceName = models.get(0).getNamespace().getNamespaceName();
     String operator = userInfoHolder.getUser().getUserId();
 
@@ -191,15 +193,20 @@ public class NamespaceController {
   public AppNamespace createAppNamespace(@PathVariable String appId,
       @RequestParam(defaultValue = "true") boolean appendNamespacePrefix,
       @Valid @RequestBody AppNamespace appNamespace) {
+
+    // 保存到 portal 数据库
     AppNamespace createdAppNamespace = appNamespaceService.createAppNamespaceInLocal(appNamespace, appendNamespacePrefix);
 
+    // 如果允许创建私有类型的 Namespace 或者是共有类型的 namespace, 则授予操作者 Namespace role
     if (portalConfig.canAppAdminCreatePrivateNamespace() || createdAppNamespace.isPublic()) {
       namespaceService.assignNamespaceRoleToOperator(appId, appNamespace.getName(),
           userInfoHolder.getUser().getUserId());
     }
 
+    // 发布 AppNamespace 创建事件
     publisher.publishEvent(new AppNamespaceCreationEvent(createdAppNamespace));
 
+    // 返回创建的 AppNamespace
     return createdAppNamespace;
   }
 

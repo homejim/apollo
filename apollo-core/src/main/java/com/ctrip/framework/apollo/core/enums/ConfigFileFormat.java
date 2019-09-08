@@ -39,6 +39,12 @@ public enum ConfigFileFormat {
     throw new IllegalArgumentException(value + " can not map enum");
   }
 
+  /**
+   * 判断是否为有效的格式
+   *
+   * @param value
+   * @return
+   */
   public static boolean isValidFormat(String value) {
     try {
       fromString(value);

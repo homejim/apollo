@@ -321,6 +321,13 @@ public class NamespaceService {
     return itemBO;
   }
 
+  /**
+   * 授权 namespace 修改和发布的角色给操作者
+   *
+   * @param appId
+   * @param namespaceName
+   * @param operator
+   */
   public void assignNamespaceRoleToOperator(String appId, String namespaceName, String operator) {
     //default assign modify、release namespace role to namespace creator
 

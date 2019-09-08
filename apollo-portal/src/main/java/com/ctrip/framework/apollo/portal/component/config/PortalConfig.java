@@ -39,6 +39,7 @@ public class PortalConfig extends RefreshableConfig {
   }
 
   /***
+   * 环境信息。 从 apollo.portal.envs 配置信息中获取， 没有则默认 "FAT", "UAT", "PRO"
    * Level: important
    **/
   public List<Env> portalSupportedEnvs() {
