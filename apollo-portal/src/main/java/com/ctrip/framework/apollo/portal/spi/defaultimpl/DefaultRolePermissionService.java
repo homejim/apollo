@@ -113,15 +113,19 @@ public class DefaultRolePermissionService implements RolePermissionService {
 
     /**
      * Remove role from users
+     * 移除用户的角色
      */
     @Transactional
     public void removeRoleFromUsers(String roleName, Set<String> userIds, String operatorUserId) {
+        // 检查是否存在相应的角色
         Role role = findRoleByRoleName(roleName);
         Preconditions.checkState(role != null, "Role %s doesn't exist!", roleName);
 
+        // 获取用户-角色记录
         List<UserRole> existedUserRoles =
                 userRoleRepository.findByUserIdInAndRoleId(userIds, role.getId());
 
+        // 删除 userrole 表中对应的记录
         for (UserRole userRole : existedUserRoles) {
             userRole.setDeleted(true);
             userRole.setDataChangeLastModifiedTime(new Date());
@@ -133,16 +137,20 @@ public class DefaultRolePermissionService implements RolePermissionService {
 
     /**
      * Query users with role
+     * 查找拥有某角色的所有用户
      */
     public Set<UserInfo> queryUsersWithRole(String roleName) {
+        // 检查是否存在相应的角色
         Role role = findRoleByRoleName(roleName);
 
         if (role == null) {
             return Collections.emptySet();
         }
 
+        // 使用 roleid 查询数据库
         List<UserRole> userRoles = userRoleRepository.findByRoleId(role.getId());
 
+        // 构建返回值
         Set<UserInfo> users = userRoles.stream().map(userRole -> {
             UserInfo userInfo = new UserInfo();
             userInfo.setUserId(userRole.getUserId());
@@ -154,6 +162,7 @@ public class DefaultRolePermissionService implements RolePermissionService {
 
     /**
      * Find role by role name, note that roleName should be unique
+     * 根据角色名称查找角色， 角色的名称是唯一的
      */
     public Role findRoleByRoleName(String roleName) {
         return roleRepository.findTopByRoleName(roleName);
@@ -161,30 +170,36 @@ public class DefaultRolePermissionService implements RolePermissionService {
 
     /**
      * Check whether user has the permission
+     * 查看用户是否拥有权限
      */
     public boolean userHasPermission(String userId, String permissionType, String targetId) {
+
+        // 获取对应的权限， permissionType+targetId确定唯一的权限
         Permission permission =
                 permissionRepository.findTopByPermissionTypeAndTargetId(permissionType, targetId);
         if (permission == null) {
             return false;
         }
 
+        // 如果是超级管理员则放行
         if (isSuperAdmin(userId)) {
             return true;
         }
 
+        // 查找用户的所有权限
         List<UserRole> userRoles = userRoleRepository.findByUserId(userId);
         if (CollectionUtils.isEmpty(userRoles)) {
             return false;
         }
 
         Set<Long> roleIds =
-            userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toSet());
+                userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toSet());
         List<RolePermission> rolePermissions = rolePermissionRepository.findByRoleIdIn(roleIds);
         if (CollectionUtils.isEmpty(rolePermissions)) {
             return false;
         }
 
+        // 如果 查出的与传入的匹配上， 则返回 true
         for (RolePermission rolePermission : rolePermissions) {
             if (rolePermission.getPermissionId() == permission.getId()) {
                 return true;
@@ -194,6 +209,11 @@ public class DefaultRolePermissionService implements RolePermissionService {
         return false;
     }
 
+    /**
+     * 通过用户 userid 获取对应 userrole
+     * @param userId
+     * @return
+     */
     @Override
     public List<Role> findUserRoles(String userId) {
         List<UserRole> userRoles = userRoleRepository.findByUserId(userId);
@@ -206,6 +226,12 @@ public class DefaultRolePermissionService implements RolePermissionService {
         return Lists.newLinkedList(roleRepository.findAllById(roleIds));
     }
 
+    /**
+     * 是否为超级管理员
+     *
+     * @param userId
+     * @return
+     */
     public boolean isSuperAdmin(String userId) {
         return portalConfig.superAdmins().contains(userId);
     }
@@ -216,6 +242,8 @@ public class DefaultRolePermissionService implements RolePermissionService {
      */
     @Transactional
     public Permission createPermission(Permission permission) {
+
+        // permissionType + targetId 校验是否存在
         String permissionType = permission.getPermissionType();
         String targetId = permission.getTargetId();
         Permission current =
@@ -228,14 +256,17 @@ public class DefaultRolePermissionService implements RolePermissionService {
 
     /**
      * Create permissions, note that permissionType + targetId should be unique
+     * 创建权限，  permissionType + targetId 必须唯一
      */
     @Transactional
     public Set<Permission> createPermissions(Set<Permission> permissions) {
+        // 根据 appid 进行分类， 后进行批量校验
         Multimap<String, String> targetIdPermissionTypes = HashMultimap.create();
         for (Permission permission : permissions) {
             targetIdPermissionTypes.put(permission.getTargetId(), permission.getPermissionType());
         }
 
+        // 校验
         for (String targetId : targetIdPermissionTypes.keySet()) {
             Collection<String> permissionTypes = targetIdPermissionTypes.get(targetId);
             List<Permission> current =
@@ -245,10 +276,16 @@ public class DefaultRolePermissionService implements RolePermissionService {
                     targetId);
         }
 
+        // 保存
         Iterable<Permission> results = permissionRepository.saveAll(permissions);
         return StreamSupport.stream(results.spliterator(), false).collect(Collectors.toSet());
     }
 
+    /**
+     * 删除 rolepermission
+     * @param appId
+     * @param operator
+     */
     @Transactional
     @Override
     public void deleteRolePermissionsByAppId(String appId, String operator) {

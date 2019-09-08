@@ -79,6 +79,11 @@ public class AppNamespaceService {
     return appNamespaceRepository.findByAppId(appId);
   }
 
+  /**
+   * 创建默认的 AppNamespace
+   *
+   * @param appId
+   */
   @Transactional
   public void createDefaultAppNamespace(String appId) {
     if (!isAppNamespaceNameUnique(appId, ConfigConsts.NAMESPACE_APPLICATION)) {

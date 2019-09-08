@@ -34,6 +34,7 @@ public class PermissionValidator {
     this.systemRoleManagerService = systemRoleManagerService;
   }
 
+  // hasModifyNamespacePermission
   public boolean hasModifyNamespacePermission(String appId, String namespaceName) {
     return rolePermissionService.userHasPermission(userInfoHolder.getUser().getUserId(),
         PermissionType.MODIFY_NAMESPACE,

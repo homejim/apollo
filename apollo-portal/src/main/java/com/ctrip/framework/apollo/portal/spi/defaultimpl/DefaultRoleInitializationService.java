@@ -40,13 +40,14 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
   public void initAppRoles(App app) {
     String appId = app.getAppId();
 
-    // 创建对应的 App 管理员角色
+    // 构建对应的 App 管理员角色名称
     String appMasterRoleName = RoleUtils.buildAppMasterRoleName(appId);
 
     //has created before。 检查是否已经创建
     if (rolePermissionService.findRoleByRoleName(appMasterRoleName) != null) {
       return;
     }
+
     String operator = app.getDataChangeCreatedBy();
     //create app permissions。 创建对应的 app 权限
     createAppMasterRole(appId, operator);
@@ -170,18 +171,26 @@ public class DefaultRoleInitializationService implements RoleInitializationServi
     }
   }
 
+  /**
+   * 创建 APP 管理员的角色
+   *
+   * @param appId
+   * @param operator
+   */
   private void createAppMasterRole(String appId, String operator) {
+    // app 权限： CreateCluster， CreateNamespace， AssignRole
     Set<Permission> appPermissions =
-        Stream.of(PermissionType.CREATE_CLUSTER, PermissionType.CREATE_NAMESPACE, PermissionType.ASSIGN_ROLE)
-            .map(permissionType -> createPermission(appId, permissionType, operator)).collect(Collectors.toSet());
+            Stream.of(PermissionType.CREATE_CLUSTER, PermissionType.CREATE_NAMESPACE, PermissionType.ASSIGN_ROLE)
+                    .map(permissionType -> createPermission(appId, permissionType, operator)).collect(Collectors.toSet());
     Set<Permission> createdAppPermissions = rolePermissionService.createPermissions(appPermissions);
     Set<Long>
-        appPermissionIds =
-        createdAppPermissions.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+            appPermissionIds =
+            createdAppPermissions.stream().map(BaseEntity::getId).collect(Collectors.toSet());
 
-    //create app master role
+    //create app master role。 根据权限创建对应的 role
     Role appMasterRole = createRole(RoleUtils.buildAppMasterRoleName(appId), operator);
 
+    // 创建角色及其与权限的映射
     rolePermissionService.createRoleWithPermissions(appMasterRole, appPermissionIds);
   }
 
