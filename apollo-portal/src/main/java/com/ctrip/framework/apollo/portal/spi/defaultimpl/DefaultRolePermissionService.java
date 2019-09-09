@@ -170,7 +170,7 @@ public class DefaultRolePermissionService implements RolePermissionService {
 
     /**
      * Check whether user has the permission
-     * 查看用户是否拥有权限
+     * 查看用户是否拥有对应的权限
      */
     public boolean userHasPermission(String userId, String permissionType, String targetId) {
 

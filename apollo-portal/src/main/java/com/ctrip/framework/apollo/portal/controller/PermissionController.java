@@ -62,12 +62,26 @@ public class PermissionController {
     this.permissionValidator = permissionValidator;
   }
 
+  /**
+   * 初始化 app 权限
+   *
+   * @param appId
+   * @param namespaceName
+   * @return
+   */
   @PostMapping("/apps/{appId}/initPermission")
   public ResponseEntity<Void> initAppPermission(@PathVariable String appId, @RequestBody String namespaceName) {
     roleInitializationService.initNamespaceEnvRoles(appId, namespaceName, userInfoHolder.getUser().getUserId());
     return ResponseEntity.ok().build();
   }
 
+  /**
+   * 是否拥有某权限
+   *
+   * @param appId
+   * @param permissionType
+   * @return
+   */
   @GetMapping("/apps/{appId}/permissions/{permissionType}")
   public ResponseEntity<PermissionCondition> hasPermission(@PathVariable String appId, @PathVariable String permissionType) {
     PermissionCondition permissionCondition = new PermissionCondition();
@@ -102,6 +116,7 @@ public class PermissionController {
     return ResponseEntity.ok().body(permissionCondition);
   }
 
+  // 是否拥有 root 权限
   @GetMapping("/permissions/root")
   public ResponseEntity<PermissionCondition> hasRootPermission() {
     PermissionCondition permissionCondition = new PermissionCondition();
