@@ -132,6 +132,7 @@ public class NamespaceController {
     String namespaceName = models.get(0).getNamespace().getNamespaceName();
     String operator = userInfoHolder.getUser().getUserId();
 
+    // 授权角色
     roleInitializationService.initNamespaceRoles(appId, namespaceName, operator);
     roleInitializationService.initNamespaceEnvRoles(appId, namespaceName, operator);
 
