@@ -128,7 +128,10 @@ public class ItemService {
 
   @Transactional
   public Item save(Item entity) {
+
+    // key 长度校验
     checkItemKeyLength(entity.getKey());
+    // vallue 长度校验
     checkItemValueLength(entity.getNamespaceId(), entity.getValue());
 
     entity.setId(0);//protection
@@ -139,10 +142,12 @@ public class ItemService {
       entity.setLineNum(lineNum);
     }
 
+    // 保存 Item
     Item item = itemRepository.save(entity);
 
+    // 记录 Audit 到数据库中
     auditService.audit(Item.class.getSimpleName(), item.getId(), Audit.OP.INSERT,
-                       item.getDataChangeCreatedBy());
+            item.getDataChangeCreatedBy());
 
     return item;
   }

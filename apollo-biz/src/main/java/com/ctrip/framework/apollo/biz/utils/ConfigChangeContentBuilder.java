@@ -12,12 +12,26 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 
 
+/**
+ * 配置变更内容 Builder
+ */
 public class ConfigChangeContentBuilder {
 
   private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
+  /**
+   * 创建的 Item 集合
+   */
   private List<Item> createItems = new LinkedList<>();
+
+  /**
+   * 更新的 Item 集合
+   */
   private List<ItemPair> updateItems = new LinkedList<>();
+
+  /**
+   * 删除的 Item 集合
+   */
   private List<Item> deleteItems = new LinkedList<>();
 
 
@@ -28,6 +42,13 @@ public class ConfigChangeContentBuilder {
     return this;
   }
 
+  /**
+   * 这里使用到内部类 ItemPair
+   *
+   * @param oldItem
+   * @param newItem
+   * @return
+   */
   public ConfigChangeContentBuilder updateItem(Item oldItem, Item newItem) {
     if (!oldItem.getValue().equals(newItem.getValue())){
       ItemPair itemPair = new ItemPair(cloneItem(oldItem), cloneItem(newItem));
@@ -47,6 +68,11 @@ public class ConfigChangeContentBuilder {
     return !createItems.isEmpty() || !updateItems.isEmpty() || !deleteItems.isEmpty();
   }
 
+  /**
+   * 构造成 json 格式
+   *
+   * @return
+   */
   public String build() {
     //因为事务第一段提交并没有更新时间,所以build时统一更新
     Date now = new Date();
@@ -65,6 +91,9 @@ public class ConfigChangeContentBuilder {
     return gson.toJson(this);
   }
 
+  /**
+   * Item 对， 处理旧的 item 和新的 item
+   */
   static class ItemPair {
 
     Item oldItem;

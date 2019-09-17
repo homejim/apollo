@@ -16,19 +16,34 @@ import javax.persistence.Table;
 @Where(clause = "isDeleted = 0")
 public class Item extends BaseEntity {
 
+  /**
+   * 对应的 namespace id
+   */
   @Column(name = "NamespaceId", nullable = false)
   private long namespaceId;
 
+  /**
+   * key。 不同文件类型不同
+   */
   @Column(name = "key", nullable = false)
   private String key;
 
+  /**
+   * value
+   */
   @Column(name = "value")
   @Lob
   private String value;
 
+  /**
+   * 备注
+   */
   @Column(name = "comment")
   private String comment;
 
+  /**
+   * 行号
+   */
   @Column(name = "LineNum")
   private Integer lineNum;
 

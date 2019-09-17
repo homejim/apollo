@@ -71,11 +71,17 @@ public class ItemController {
   public ItemDTO createItem(@PathVariable String appId, @PathVariable String env,
                             @PathVariable String clusterName, @PathVariable String namespaceName,
                             @RequestBody ItemDTO item) {
+
+    /**
+     * 校验
+     */
     checkModel(isValidItem(item));
 
     //protect
     item.setLineNum(0);
     item.setId(0);
+
+    // 获取当前操作人
     String userId = userInfoHolder.getUser().getUserId();
     item.setDataChangeCreatedBy(userId);
     item.setDataChangeLastModifiedBy(userId);

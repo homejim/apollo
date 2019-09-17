@@ -16,19 +16,34 @@ import javax.persistence.Table;
 @Where(clause = "isDeleted = 0")
 public class Commit extends BaseEntity {
 
+  /**
+   * 变更合集
+   */
   @Lob
   @Column(name = "ChangeSets", nullable = false)
   private String changeSets;
 
+  /**
+   * Application id
+   */
   @Column(name = "AppId", nullable = false)
   private String appId;
 
+  /**
+   * Cluster 名称
+   */
   @Column(name = "ClusterName", nullable = false)
   private String clusterName;
 
+  /**
+   * Namespace 名称
+   */
   @Column(name = "NamespaceName", nullable = false)
   private String namespaceName;
 
+  /**
+   * 备注
+   */
   @Column(name = "Comment")
   private String comment;
 
